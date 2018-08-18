@@ -1,8 +1,10 @@
 package main
 
-import "github.com/nsf/termbox-go"
-import "math/rand"
-import "time"
+import (
+	"github.com/nsf/termbox-go"
+	"math/rand"
+	"time"
+)
 
 type Cell struct {
 	alive bool
