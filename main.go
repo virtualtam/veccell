@@ -32,6 +32,14 @@ func (b *Board) Randomize() {
 	}
 }
 
+func (b *Board) RandomizeArea(startRow, endRow, startCol, endCol int) {
+	for i := startRow; i < endRow; i++ {
+		for j := startCol; j < endCol; j++ {
+			b.cells[i][j].alive = rand.Intn(2) == 1
+		}
+	}
+}
+
 func (b *Board) IsCellAlive(row, col int) bool {
 	if row < 0 || row >= b.height {
 		return false
@@ -82,7 +90,7 @@ func (b *Board) Draw() {
 	for i := 0; i < b.height; i++ {
 		for j := 0; j < b.width; j++ {
 			if b.cells[i][j].alive {
-				termbox.SetCell(i, j, 'O', termbox.ColorGreen, termbox.ColorDefault)
+				termbox.SetCell(j, i, 'O', termbox.ColorGreen, termbox.ColorDefault)
 			}
 		}
 	}
@@ -107,8 +115,10 @@ func main() {
 	termWidth, termHeight := termbox.Size()
 
 	board := Board{}
-	board.Init(termWidth, termHeight)
-	board.Randomize()
+	board.Init(termHeight, termWidth)
+	//board.Randomize()
+	//board.RandomizeArea(0, termHeight/2, 0, termWidth/2)
+	board.RandomizeArea(termHeight/4, 3*termHeight/4, termWidth/4, 3*termWidth/4)
 	board.Draw()
 
 	delay := 1000 // Milliseconds
