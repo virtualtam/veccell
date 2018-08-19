@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+const (
+	DefaultDelay = 1000 // Milliseconds
+)
+
 type Cell struct {
 	alive bool
 }
@@ -89,7 +93,7 @@ func (b *Board) Draw() {
 	for i := 0; i < b.height; i++ {
 		for j := 0; j < b.width; j++ {
 			if b.cells[i][j].alive {
-				termbox.SetCell(j, i, 'O', termbox.ColorGreen, termbox.ColorDefault)
+				termbox.SetCell(j, i, 'O', termbox.ColorDefault, termbox.ColorDefault)
 			}
 		}
 	}
@@ -98,6 +102,7 @@ func (b *Board) Draw() {
 }
 
 func main() {
+	// Termbox setup
 	err := termbox.Init()
 	if err != nil {
 		panic(err)
@@ -113,6 +118,7 @@ func main() {
 		}
 	}()
 
+	// Game board setup
 	board := Board{height: termHeight, width: termWidth}
 	board.Init()
 	//board.Randomize()
@@ -120,7 +126,15 @@ func main() {
 	board.RandomizeArea(termHeight/4, 3*termHeight/4, termWidth/4, 3*termWidth/4)
 	board.Draw()
 
-	delay := 1000 // Milliseconds
+	delay := DefaultDelay
+
+	drawQueue := make(chan bool)
+	go func(delay *int) {
+		for {
+			time.Sleep(time.Duration(*delay) * time.Millisecond)
+			drawQueue <- true
+		}
+	}(&delay)
 
 mainloop:
 	for {
@@ -144,8 +158,7 @@ mainloop:
 				}
 			}
 
-		default:
-			time.Sleep(time.Duration(delay) * time.Millisecond)
+		case <-drawQueue:
 			board.Next()
 			board.Draw()
 		}
