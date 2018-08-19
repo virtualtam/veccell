@@ -16,13 +16,10 @@ type Board struct {
 	cells  [][]Cell
 }
 
-func (b *Board) Init(height, width int) {
-	b.height = height
-	b.width = width
-
-	b.cells = make([][]Cell, height)
-	for i := 0; i < height; i++ {
-		b.cells[i] = make([]Cell, width)
+func (b *Board) Init() {
+	b.cells = make([][]Cell, b.height)
+	for i := 0; i < b.height; i++ {
+		b.cells[i] = make([]Cell, b.width)
 	}
 }
 
@@ -68,8 +65,8 @@ func (b *Board) CountLiveNeighbours(row, col int) int {
 }
 
 func (b *Board) Next() {
-	var nextBoard Board
-	nextBoard.Init(b.height, b.width)
+	nextBoard := Board{height: b.height, width: b.width}
+	nextBoard.Init()
 
 	for i := 0; i < b.height; i++ {
 		for j := 0; j < b.width; j++ {
@@ -107,6 +104,8 @@ func main() {
 	}
 	defer termbox.Close()
 
+	termWidth, termHeight := termbox.Size()
+
 	eventQueue := make(chan termbox.Event)
 	go func() {
 		for {
@@ -114,10 +113,8 @@ func main() {
 		}
 	}()
 
-	termWidth, termHeight := termbox.Size()
-
-	board := Board{}
-	board.Init(termHeight, termWidth)
+	board := Board{height: termHeight, width: termWidth}
+	board.Init()
 	//board.Randomize()
 	//board.RandomizeArea(0, termHeight/2, 0, termWidth/2)
 	board.RandomizeArea(termHeight/4, 3*termHeight/4, termWidth/4, 3*termWidth/4)
