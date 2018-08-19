@@ -148,12 +148,22 @@ mainloop:
 				case termbox.KeyCtrlC:
 					break mainloop
 				case termbox.KeyArrowUp:
-					delay += 100
+					switch {
+					case delay < 10:
+						delay++
+					case delay < 100:
+						delay += 10
+					default:
+						delay += 100
+					}
 				case termbox.KeyArrowDown:
-					if delay > 100 {
+					switch {
+					case delay > 100:
 						delay -= 100
-					} else if delay > 10 {
+					case delay > 10:
 						delay -= 10
+					case delay > 2:
+						delay--
 					}
 				}
 			}
