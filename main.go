@@ -27,6 +27,14 @@ func (b *Board) Init() {
 	}
 }
 
+func (b *Board) CreateGliderAt(row, col int) {
+	b.cells[row-1][col].alive = true
+	b.cells[row][col+1].alive = true
+	b.cells[row+1][col-1].alive = true
+	b.cells[row+1][col].alive = true
+	b.cells[row+1][col+1].alive = true
+}
+
 func (b *Board) Randomize() {
 	for i := 0; i < b.height; i++ {
 		for j := 0; j < b.width; j++ {
@@ -68,6 +76,19 @@ func (b *Board) CountLiveNeighbours(row, col int) int {
 	return liveNeighbours
 }
 
+// On to the next iteration!
+//
+// 1. any live cell with fewer than two live neighbours dies, as if
+// by under population
+//
+// 2. any live cell with two or three live neighbours lives on to
+// the the next generation
+//
+// 3. any live cell with more than three live neighbours dies, as if
+// by overpopulation
+//
+// 4. any dead cell with exactly three live neighbours becomes a
+// live cell, as if by reproduction
 func (b *Board) Next() {
 	nextBoard := Board{height: b.height, width: b.width}
 	nextBoard.Init()
@@ -76,10 +97,14 @@ func (b *Board) Next() {
 		for j := 0; j < b.width; j++ {
 			liveNeighbours := b.CountLiveNeighbours(i, j)
 
-			if liveNeighbours == 2 || liveNeighbours == 3 {
-				nextBoard.cells[i][j].alive = true
+			if b.cells[i][j].alive {
+				if liveNeighbours == 2 || liveNeighbours == 3 {
+					nextBoard.cells[i][j].alive = true
+				}
 			} else {
-				nextBoard.cells[i][j].alive = false
+				if liveNeighbours == 3 {
+					nextBoard.cells[i][j].alive = true
+				}
 			}
 		}
 	}
@@ -124,6 +149,7 @@ func main() {
 	//board.Randomize()
 	//board.RandomizeArea(0, termHeight/2, 0, termWidth/2)
 	board.RandomizeArea(termHeight/4, 3*termHeight/4, termWidth/4, 3*termWidth/4)
+	//board.CreateGliderAt(7, 7)
 	board.Draw()
 
 	delay := DefaultDelay
