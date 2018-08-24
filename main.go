@@ -7,7 +7,8 @@ import (
 )
 
 const (
-	DefaultDelay = 1000 // Milliseconds
+	DefaultDelay            = 1000 // Milliseconds
+	DefaultBorderCellsAlive = false
 )
 
 type Cell struct {
@@ -15,9 +16,10 @@ type Cell struct {
 }
 
 type Board struct {
-	height int
-	width  int
-	cells  [][]Cell
+	height           int
+	width            int
+	borderCellsAlive bool
+	cells            [][]Cell
 }
 
 func (b *Board) Init() {
@@ -53,10 +55,10 @@ func (b *Board) RandomizeArea(startRow, endRow, startCol, endCol int) {
 
 func (b *Board) IsCellAlive(row, col int) bool {
 	if row < 0 || row >= b.height {
-		return false
+		return b.borderCellsAlive
 	}
 	if col < 0 || col >= b.width {
-		return false
+		return b.borderCellsAlive
 	}
 	return b.cells[row][col].alive
 }
@@ -90,7 +92,11 @@ func (b *Board) CountLiveNeighbours(row, col int) int {
 // 4. any dead cell with exactly three live neighbours becomes a
 // live cell, as if by reproduction
 func (b *Board) Next() {
-	nextBoard := Board{height: b.height, width: b.width}
+	nextBoard := Board{
+		height:           b.height,
+		width:            b.width,
+		borderCellsAlive: b.borderCellsAlive,
+	}
 	nextBoard.Init()
 
 	for i := 0; i < b.height; i++ {
@@ -144,11 +150,15 @@ func main() {
 	}()
 
 	// Game board setup
-	board := Board{height: termHeight, width: termWidth}
+	board := Board{
+		height:           termHeight,
+		width:            termWidth,
+		borderCellsAlive: DefaultBorderCellsAlive,
+	}
 	board.Init()
-	//board.Randomize()
+	board.Randomize()
 	//board.RandomizeArea(0, termHeight/2, 0, termWidth/2)
-	board.RandomizeArea(termHeight/4, 3*termHeight/4, termWidth/4, 3*termWidth/4)
+	//board.RandomizeArea(termHeight/4, 3*termHeight/4, termWidth/4, 3*termWidth/4)
 	//board.CreateGliderAt(7, 7)
 	board.Draw()
 
