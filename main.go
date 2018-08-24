@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"github.com/nsf/termbox-go"
 	"math/rand"
 	"time"
@@ -133,6 +134,14 @@ func (b *Board) Draw() {
 }
 
 func main() {
+	// Command-line parameters
+	var borderCellsAlive bool
+	var delay int
+
+	flag.BoolVar(&borderCellsAlive, "borderCellsAlive", DefaultBorderCellsAlive, "Whether the border cells are considered alive or dead")
+	flag.IntVar(&delay, "delay", DefaultDelay, "Delay between two iterations (milliseconds)")
+	flag.Parse()
+
 	// Termbox setup
 	err := termbox.Init()
 	if err != nil {
@@ -153,7 +162,7 @@ func main() {
 	board := Board{
 		height:           termHeight,
 		width:            termWidth,
-		borderCellsAlive: DefaultBorderCellsAlive,
+		borderCellsAlive: borderCellsAlive,
 	}
 	board.Init()
 	board.Randomize()
@@ -161,8 +170,6 @@ func main() {
 	//board.RandomizeArea(termHeight/4, 3*termHeight/4, termWidth/4, 3*termWidth/4)
 	//board.CreateGliderAt(7, 7)
 	board.Draw()
-
-	delay := DefaultDelay
 
 	drawQueue := make(chan bool)
 	go func(delay *int) {
