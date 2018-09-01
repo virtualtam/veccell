@@ -159,6 +159,7 @@ func main() {
 	}()
 
 	// Game board setup
+	rand.Seed(time.Now().UTC().UnixNano())
 	board := Board{
 		height:           termHeight,
 		width:            termWidth,
