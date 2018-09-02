@@ -47,6 +47,30 @@ var Colonies = []Colony{
 		symbol: 'X',
 		color:  termbox.ColorBlue,
 	},
+	{
+		id:     4,
+		name:   "Yellow",
+		symbol: '$',
+		color:  termbox.ColorYellow,
+	},
+	{
+		id:     5,
+		name:   "Magenta",
+		symbol: '*',
+		color:  termbox.ColorMagenta,
+	},
+	{
+		id:     6,
+		name:   "Cyan",
+		symbol: '%',
+		color:  termbox.ColorCyan,
+	},
+	{
+		id:     7,
+		name:   "White",
+		symbol: '8',
+		color:  termbox.ColorWhite,
+	},
 }
 
 type Cell struct {
