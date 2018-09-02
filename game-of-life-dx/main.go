@@ -8,8 +8,11 @@ import (
 )
 
 const (
-	DefaultDelay     = 1000 // Milliseconds
-	DefaultNColonies = 3
+	DefaultDelay        = 1000 // Milliseconds
+	DefaultNColonies    = 3
+	DefaultShowExplored = false
+	DefaultBackground   = termbox.ColorDefault
+	OnceAliveBackground = termbox.ColorBlack
 )
 
 type Colony struct {
@@ -47,8 +50,9 @@ var Colonies = []Colony{
 }
 
 type Cell struct {
-	alive  bool
-	colony *Colony
+	alive     bool
+	onceAlive bool
+	colony    *Colony
 }
 
 func (c *Cell) ChooseColony(neighbours []*Cell) {
@@ -94,7 +98,8 @@ func newBoard(nRows, nCols, nColonies int) Board {
 func (b *Board) Randomize() {
 	for i := 0; i < b.nRows; i++ {
 		for j := 0; j < b.nCols; j++ {
-			b.cells[i][j].alive = rand.Intn(2) == 1
+			b.cells[i][j].alive = rand.Intn(5) == 1
+			b.cells[i][j].onceAlive = b.cells[i][j].alive
 			b.cells[i][j].colony = &b.colonies[rand.Intn(b.nColonies)]
 		}
 	}
@@ -137,6 +142,7 @@ func (b *Board) Next() {
 		for j := 0; j < b.nCols; j++ {
 			neighbours := b.LiveNeighboursAt(i, j)
 			liveNeighbours := len(neighbours)
+			nextBoard.cells[i][j].onceAlive = b.cells[i][j].onceAlive
 
 			if b.cells[i][j].alive {
 				if liveNeighbours == 2 || liveNeighbours == 3 {
@@ -146,6 +152,7 @@ func (b *Board) Next() {
 			} else {
 				if liveNeighbours == 3 {
 					nextBoard.cells[i][j].alive = true
+					nextBoard.cells[i][j].onceAlive = true
 					nextBoard.cells[i][j].ChooseColony(neighbours)
 				}
 			}
@@ -155,19 +162,33 @@ func (b *Board) Next() {
 	b.cells = nextBoard.cells
 }
 
-func (b *Board) Draw() {
+func (b *Board) Draw(showExplored bool) {
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
 	for i := 0; i < b.nRows; i++ {
 		for j := 0; j < b.nCols; j++ {
-			if b.cells[i][j].alive {
-				termbox.SetCell(
-					j,
-					i,
-					b.cells[i][j].colony.symbol,
-					b.cells[i][j].colony.color,
-					termbox.ColorDefault,
-				)
+			if showExplored {
+				if b.cells[i][j].alive {
+					termbox.SetCell(
+						j,
+						i,
+						b.cells[i][j].colony.symbol,
+						b.cells[i][j].colony.color,
+						OnceAliveBackground,
+					)
+				} else if b.cells[i][j].onceAlive {
+					termbox.SetCell(j, i, ' ', termbox.ColorDefault, OnceAliveBackground)
+				}
+			} else {
+				if b.cells[i][j].alive {
+					termbox.SetCell(
+						j,
+						i,
+						b.cells[i][j].colony.symbol,
+						b.cells[i][j].colony.color,
+						DefaultBackground,
+					)
+				}
 			}
 		}
 	}
@@ -177,11 +198,15 @@ func (b *Board) Draw() {
 
 func main() {
 	// Command-line parameters
-	var nColonies int
-	var delay int
+	var (
+		delay        int
+		nColonies    int
+		showExplored bool
+	)
 
-	flag.IntVar(&nColonies, "colonies", DefaultNColonies, "Number of colonies")
 	flag.IntVar(&delay, "delay", DefaultDelay, "Delay between two iterations (milliseconds)")
+	flag.IntVar(&nColonies, "colonies", DefaultNColonies, "Number of colonies")
+	flag.BoolVar(&showExplored, "show-explored", DefaultShowExplored, "Show explored regions")
 	flag.Parse()
 
 	// Termbox setup
@@ -204,7 +229,7 @@ func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	board := newBoard(termHeight, termWidth, nColonies)
 	board.Randomize()
-	board.Draw()
+	board.Draw(showExplored)
 
 	drawQueue := make(chan bool)
 	go func(delay *int) {
@@ -248,7 +273,7 @@ mainloop:
 
 		case <-drawQueue:
 			board.Next()
-			board.Draw()
+			board.Draw(showExplored)
 		}
 	}
 }
