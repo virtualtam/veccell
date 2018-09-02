@@ -1,3 +1,10 @@
+// Package main implements Conway's Game of Lifei.
+//
+// This implementation comes with additional bells and whistles:
+// - each Cell belongs to a Colony;
+// - the Colony a Cell belongs to depends on the surrounding live Cells.
+//
+// The board is rendered on the terminal using the Termbox library.
 package main
 
 import (
@@ -15,6 +22,8 @@ const (
 	OnceAliveBackground = termbox.ColorBlack
 )
 
+// A Colony represents a type of population, and can feature distinctive
+// attributes.
 type Colony struct {
 	id     int
 	name   string
@@ -22,6 +31,7 @@ type Colony struct {
 	color  termbox.Attribute
 }
 
+// The available Colonies.
 var Colonies = []Colony{
 	{
 		id:     0,
@@ -73,12 +83,14 @@ var Colonies = []Colony{
 	},
 }
 
+// A Cell can be either alive or dead, and belongs to a Colony.
 type Cell struct {
 	alive     bool
 	onceAlive bool
 	colony    *Colony
 }
 
+// ChooseColony sets a Cell's Colony according to its live neighbours.
 func (c *Cell) ChooseColony(neighbours []*Cell) {
 	colonies := make(map[*Colony]int)
 	if c.colony != nil {
@@ -96,6 +108,7 @@ func (c *Cell) ChooseColony(neighbours []*Cell) {
 	}
 }
 
+// A Board holds the game's parameters and state.
 type Board struct {
 	nRows     int
 	nCols     int
@@ -104,7 +117,8 @@ type Board struct {
 	cells     [][]Cell
 }
 
-func newBoard(nRows, nCols, nColonies int) Board {
+// NewBoard creates and initializes a Board.
+func NewBoard(nRows, nCols, nColonies int) Board {
 	b := Board{
 		nRows:     nRows,
 		nCols:     nCols,
@@ -119,6 +133,8 @@ func newBoard(nRows, nCols, nColonies int) Board {
 	return b
 }
 
+// Randomize sets a board's Cells in a random state (alive|dead) and assigns it
+// to a randomly chosen Colony.
 func (b *Board) Randomize() {
 	for i := 0; i < b.nRows; i++ {
 		for j := 0; j < b.nCols; j++ {
@@ -129,6 +145,8 @@ func (b *Board) Randomize() {
 	}
 }
 
+// LiveNeighboursAt returns the live Cells surrounding the Cell at the given
+// position.
 func (b *Board) LiveNeighboursAt(row, col int) []*Cell {
 	neighbours := []*Cell{}
 
@@ -159,8 +177,28 @@ func (b *Board) LiveNeighboursAt(row, col int) []*Cell {
 	return neighbours
 }
 
+// Next computes the next iteration of the game, and updates the Board's state.
+//
+// On to the next iteration!
+//
+// 1. Any live cell with fewer than two live neighbours dies, as if
+// by under population.
+//
+// 2. Any live cell with two or three live neighbours lives on to
+// the the next generation.
+//
+// 3. Any live cell with more than three live neighbours dies, as if
+// by overpopulation.
+//
+// 4. Any dead cell with exactly three live neighbours becomes a
+// live cell, as if by reproduction.
+//
+// DX bells and whistles:
+//
+// 5. Any live cell belongs to the colony that has the most live neighbours, as
+// if by conquest or conversion (Wololo!).
 func (b *Board) Next() {
-	nextBoard := newBoard(b.nRows, b.nCols, b.nColonies)
+	nextBoard := NewBoard(b.nRows, b.nCols, b.nColonies)
 
 	for i := 0; i < b.nRows; i++ {
 		for j := 0; j < b.nCols; j++ {
@@ -186,6 +224,7 @@ func (b *Board) Next() {
 	b.cells = nextBoard.cells
 }
 
+// Draw renders the Board on the terminal.
 func (b *Board) Draw(showExplored bool) {
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
@@ -251,7 +290,7 @@ func main() {
 
 	// Game board setup
 	rand.Seed(time.Now().UTC().UnixNano())
-	board := newBoard(termHeight, termWidth, nColonies)
+	board := NewBoard(termHeight, termWidth, nColonies)
 	board.Randomize()
 	board.Draw(showExplored)
 

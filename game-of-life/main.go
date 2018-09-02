@@ -1,3 +1,6 @@
+// Package main implements Conway's Game of Life.
+//
+// The board is rendered on the terminal using the Termbox library.
 package main
 
 import (
@@ -12,10 +15,12 @@ const (
 	DefaultBorderCellsAlive = false
 )
 
+// A Cell can be alive or dead.
 type Cell struct {
 	alive bool
 }
 
+// A Board holds the game's parameters and state.
 type Board struct {
 	height           int
 	width            int
@@ -23,6 +28,7 @@ type Board struct {
 	cells            [][]Cell
 }
 
+// Init initializes a Board's components.
 func (b *Board) Init() {
 	b.cells = make([][]Cell, b.height)
 	for i := 0; i < b.height; i++ {
@@ -30,6 +36,15 @@ func (b *Board) Init() {
 	}
 }
 
+// CreateGliderAt create a glider object centered on the provided coordinates.
+//
+// Glider pattern:
+//
+//     O
+//      O
+//    OOO
+//
+// See https://en.wikipedia.org/wiki/Glider_(Conway%27s_Life)
 func (b *Board) CreateGliderAt(row, col int) {
 	b.cells[row-1][col].alive = true
 	b.cells[row][col+1].alive = true
@@ -38,6 +53,7 @@ func (b *Board) CreateGliderAt(row, col int) {
 	b.cells[row+1][col+1].alive = true
 }
 
+// Randomize sets a board's Cells in a random state (alive|dead).
 func (b *Board) Randomize() {
 	for i := 0; i < b.height; i++ {
 		for j := 0; j < b.width; j++ {
@@ -46,6 +62,8 @@ func (b *Board) Randomize() {
 	}
 }
 
+// RandomizeArea is similar to Randomize, expect it acts on a given portion of
+// the Board.
 func (b *Board) RandomizeArea(startRow, endRow, startCol, endCol int) {
 	for i := startRow; i < endRow; i++ {
 		for j := startCol; j < endCol; j++ {
@@ -54,16 +72,23 @@ func (b *Board) RandomizeArea(startRow, endRow, startCol, endCol int) {
 	}
 }
 
+// IsCellAlive returns the liveliness status of a Cell, including virtual Board
+// borders.
 func (b *Board) IsCellAlive(row, col int) bool {
 	if row < 0 || row >= b.height {
+		// horizontal borders
 		return b.borderCellsAlive
 	}
 	if col < 0 || col >= b.width {
+		// vertical borders
 		return b.borderCellsAlive
 	}
+	// actual Cell
 	return b.cells[row][col].alive
 }
 
+// CountLiveNeighbours returns the number of live Cells surrounding a Cell at a
+// given position.
 func (b *Board) CountLiveNeighbours(row, col int) int {
 	liveNeighbours := 0
 	for i := -1; i < 2; i++ {
@@ -79,6 +104,8 @@ func (b *Board) CountLiveNeighbours(row, col int) int {
 	return liveNeighbours
 }
 
+// Next computes the next iteration of the game, and updates the Board's state.
+//
 // On to the next iteration!
 //
 // 1. any live cell with fewer than two live neighbours dies, as if
@@ -119,6 +146,7 @@ func (b *Board) Next() {
 	b.cells = nextBoard.cells
 }
 
+// Draw renders the Board on the terminal.
 func (b *Board) Draw() {
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
