@@ -91,10 +91,10 @@ type Cell struct {
 }
 
 // ChooseColony sets a Cell's Colony according to its live neighbours.
-func (c *Cell) ChooseColony(neighbours []*Cell) {
+func (c *Cell) ChooseColony(ancestor Cell, neighbours []*Cell) {
 	colonies := make(map[*Colony]int)
-	if c.colony != nil {
-		colonies[c.colony] = 1
+	if ancestor.colony != nil {
+		colonies[ancestor.colony] = 1
 	}
 	for _, cell := range neighbours {
 		colonies[cell.colony]++
@@ -102,6 +102,8 @@ func (c *Cell) ChooseColony(neighbours []*Cell) {
 	maxCount := 0
 	for colony, count := range colonies {
 		if count > maxCount {
+			// Let Go's map randomization magic handle the ex-aequo case;
+			// a bit of non-determinism sure doesn't hurt?
 			maxCount = count
 			c.colony = colony
 		}
@@ -209,13 +211,13 @@ func (b *Board) Next() {
 			if b.cells[i][j].alive {
 				if liveNeighbours == 2 || liveNeighbours == 3 {
 					nextBoard.cells[i][j].alive = true
-					nextBoard.cells[i][j].ChooseColony(neighbours)
+					nextBoard.cells[i][j].ChooseColony(b.cells[i][j], neighbours)
 				}
 			} else {
 				if liveNeighbours == 3 {
 					nextBoard.cells[i][j].alive = true
 					nextBoard.cells[i][j].onceAlive = true
-					nextBoard.cells[i][j].ChooseColony(neighbours)
+					nextBoard.cells[i][j].ChooseColony(b.cells[i][j], neighbours)
 				}
 			}
 		}
