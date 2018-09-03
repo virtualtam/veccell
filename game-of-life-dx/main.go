@@ -307,6 +307,10 @@ func main() {
 mainloop:
 	for {
 		select {
+		case <-drawQueue:
+			board.Next()
+			board.Draw(showExplored)
+
 		case ev := <-eventQueue:
 			switch ev.Type {
 			case termbox.EventKey:
@@ -334,11 +338,12 @@ mainloop:
 						delay--
 					}
 				}
-			}
 
-		case <-drawQueue:
-			board.Next()
-			board.Draw(showExplored)
+				switch ev.Ch {
+				case 'q':
+					break mainloop
+				}
+			}
 		}
 	}
 }
