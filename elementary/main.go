@@ -11,11 +11,15 @@
 //  0   0   0   1   1   1   1   0   Rule  30
 //  0   1   0   1   1   0   1   0   Rule  90
 //  0   1   1   0   1   1   1   0   Rule 110
+//
+// The board is rendered on the terminal using the Termbox library.
 package main
 
 import (
+	"container/ring"
 	"flag"
 	"fmt"
+	"github.com/nsf/termbox-go"
 	"math/rand"
 	"strconv"
 	"time"
@@ -116,6 +120,47 @@ func (a *ElementaryAutomaton) Draw() {
 	fmt.Println()
 }
 
+type ElementaryAutomatonHistory struct {
+	size      int
+	automaton *ElementaryAutomaton
+	history   *ring.Ring
+}
+
+func NewElementaryAutomatonHistory(size int, automaton *ElementaryAutomaton) ElementaryAutomatonHistory {
+	h := ElementaryAutomatonHistory{size: size, automaton: automaton}
+	h.history = ring.New(h.size)
+	for i := 0; i < h.history.Len(); i++ {
+		h.history.Value = make([]Cell, len(h.automaton.cells))
+		copy(h.history.Value.([]Cell), h.automaton.cells)
+		h.history = h.history.Next()
+		h.automaton.Next()
+	}
+	return h
+}
+
+func (h *ElementaryAutomatonHistory) Next() {
+	h.automaton.Next()
+	copy(h.history.Value.([]Cell), h.automaton.cells)
+	h.history = h.history.Move(1)
+}
+
+func (h *ElementaryAutomatonHistory) Draw() {
+	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
+
+	row := 0
+	h.history.Do(func(p interface{}) {
+		cells := p.([]Cell)
+		for col := 0; col < len(cells); col++ {
+			if cells[col].alive {
+				termbox.SetCell(col, row, '+', termbox.ColorDefault, termbox.ColorDefault)
+			}
+		}
+		row++
+	})
+
+	termbox.Flush()
+}
+
 func main() {
 	var (
 		delay     int
@@ -128,19 +173,82 @@ func main() {
 	flag.IntVar(&rule, "rule", DefaultRule, "Automaton rule")
 	flag.Parse()
 
+	// Termbox setup
+	err := termbox.Init()
+	if err != nil {
+		panic(err)
+	}
+	defer termbox.Close()
+
+	termWidth, termHeight := termbox.Size()
+
+	eventQueue := make(chan termbox.Event)
+	go func() {
+		for {
+			eventQueue <- termbox.PollEvent()
+		}
+	}()
+
+	drawQueue := make(chan bool)
+	go func(delay *int) {
+		for {
+			time.Sleep(time.Duration(*delay) * time.Millisecond)
+			drawQueue <- true
+		}
+	}(&delay)
+
+	// Elementary automaton setup
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	automaton := NewElementaryAutomaton(rule, 90)
+	automaton := NewElementaryAutomaton(rule, termWidth)
 	if randomize {
 		automaton.Randomize()
 	} else {
 		automaton.StartWithCenter()
 	}
-	automaton.Draw()
+	history := NewElementaryAutomatonHistory(termHeight, &automaton)
+	history.Draw()
 
+mainloop:
 	for {
-		time.Sleep(time.Duration(delay) * time.Millisecond)
-		automaton.Next()
-		automaton.Draw()
+		select {
+		case <-drawQueue:
+			history.Next()
+			history.Draw()
+
+		case ev := <-eventQueue:
+			switch ev.Type {
+			case termbox.EventKey:
+				switch ev.Key {
+				case termbox.KeyEsc:
+					break mainloop
+				case termbox.KeyCtrlC:
+					break mainloop
+				case termbox.KeyArrowUp:
+					switch {
+					case delay < 10:
+						delay++
+					case delay < 100:
+						delay += 10
+					default:
+						delay += 100
+					}
+				case termbox.KeyArrowDown:
+					switch {
+					case delay > 100:
+						delay -= 100
+					case delay > 10:
+						delay -= 10
+					case delay > 2:
+						delay--
+					}
+				}
+
+				switch ev.Ch {
+				case 'q':
+					break mainloop
+				}
+			}
+		}
 	}
 }
