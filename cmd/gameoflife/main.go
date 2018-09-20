@@ -43,7 +43,7 @@ func main() {
 	termWidth, termHeight := termbox.Size()
 
 	// Game board setup
-	board := automaton.NewBoard(termHeight, termWidth, borderCellsAlive)
+	board := automaton.NewGameOfLife(termHeight, termWidth, borderCellsAlive)
 	board.Randomize()
 	//board.RandomizeArea(0, termHeight/2, 0, termWidth/2)
 	//board.RandomizeArea(termHeight/4, 3*termHeight/4, termWidth/4, 3*termWidth/4)

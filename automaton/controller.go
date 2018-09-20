@@ -6,6 +6,10 @@ import (
 	"github.com/nsf/termbox-go"
 )
 
+const (
+	DefaultBackground = termbox.ColorDefault
+)
+
 // The Controller handles Termbox events, user input and render queues.
 type Controller struct {
 	breakQueue chan bool

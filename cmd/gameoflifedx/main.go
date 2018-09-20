@@ -50,8 +50,8 @@ func main() {
 	termWidth, termHeight := termbox.Size()
 
 	// Game board setup
-	board := automaton.NewDxBoard(termHeight, termWidth, nColonies, showExplored)
-	board.DxRandomize()
+	board := automaton.NewGameOfLifeDx(termHeight, termWidth, nColonies, showExplored)
+	board.Randomize()
 	board.Draw()
 
 	controller := automaton.NewController(&board, &delay)
