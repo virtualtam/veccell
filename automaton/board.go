@@ -109,40 +109,6 @@ func (b *Board) DxRandomize() {
 	}
 }
 
-// IsCellAlive returns the liveliness status of a Cell, including virtual Board
-// borders.
-// FIXME: merge with LiveNeighboursAt from Life DX
-func (b *Board) IsCellAlive(row, col int) bool {
-	if row < 0 || row >= b.rows {
-		// horizontal borders
-		return b.borderCellsAlive
-	}
-	if col < 0 || col >= b.cols {
-		// vertical borders
-		return b.borderCellsAlive
-	}
-	// actual Cell
-	return b.cells[row][col].alive
-}
-
-// CountLiveNeighbours returns the number of live Cells surrounding a Cell at a
-// given position.
-// FIXME: merge with LiveNeighboursAt from Life DX
-func (b *Board) CountLiveNeighbours(row, col int) int {
-	liveNeighbours := 0
-	for i := -1; i < 2; i++ {
-		for j := -1; j < 2; j++ {
-			if i == 0 && j == 0 {
-				continue
-			}
-			if b.IsCellAlive(row+i, col+j) {
-				liveNeighbours++
-			}
-		}
-	}
-	return liveNeighbours
-}
-
 // LiveNeighboursAt returns the live Cells surrounding the Cell at the given
 // position.
 func (b *Board) LiveNeighboursAt(row, col int) []*Cell {
@@ -154,15 +120,16 @@ func (b *Board) LiveNeighboursAt(row, col int) []*Cell {
 			tmpCol := col + j
 
 			if tmpRow < 0 || tmpRow >= b.rows {
-				// assume horizontal borders are made of dead cells
+				// skip horizontal borders
 				continue
 			}
 			if tmpCol < 0 || tmpCol >= b.cols {
-				// assume vertical borders are made of dead cells
+				// skip vertical borders
 				continue
 			}
 
 			if i == 0 && j == 0 {
+				// skip current Cell
 				continue
 			}
 
@@ -200,7 +167,22 @@ func (b *Board) Next() {
 
 	for i := 0; i < b.rows; i++ {
 		for j := 0; j < b.cols; j++ {
-			liveNeighbours := b.CountLiveNeighbours(i, j)
+			neighbours := b.LiveNeighboursAt(i, j)
+			liveNeighbours := len(neighbours)
+
+			if b.borderCellsAlive {
+				if i == 0 || i == b.rows-1 {
+					if j == 0 || j == b.cols-1 {
+						liveNeighbours += 5
+					} else {
+						liveNeighbours += 3
+					}
+				} else {
+					if j == 0 || j == b.cols-1 {
+						liveNeighbours += 3
+					}
+				}
+			}
 
 			if b.cells[i][j].alive {
 				if liveNeighbours == 2 || liveNeighbours == 3 {
