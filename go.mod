@@ -1,4 +1,4 @@
-module github.com/virtualtam/tomatons
+module github.com/virtualtam/veccell
 
 require (
 	github.com/mattn/go-runewidth v0.0.3 // indirect

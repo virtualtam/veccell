@@ -1,15 +1,15 @@
-'tomatons!
-==========
+veccell - cellular automatons - power gliders
+=============================================
 
-*Tomaton*, as in *tomaton ketchup*, or maybe *tons of automatons*, is a pet
-project to toy with `Cellular Automatons` and the `Go` programming language.
+*veccell* is a pet project to toy with `Cellular Automatons`_ and the `Go`_
+programming language.
 
 Automatons
 ----------
 
-- `elementary`: an `Elementary Cellular Automaton`
-- `game-of-life`: a simple implementation of `Conway's Game of Life`
-- `game-of-life-dx`: a simple implementation of `Conway's Game of Life`, with
+- ``elementary``: an `Elementary Cellular Automaton`_
+- ``game-of-life``: a simple implementation of `Conway's Game of Life`_
+- ``game-of-life-dx``: a simple implementation of `Conway's Game of Life`_, with
   additional bells and whistles!
 
 

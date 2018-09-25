@@ -10,7 +10,7 @@ import (
 
 	"github.com/nsf/termbox-go"
 
-	"github.com/virtualtam/tomatons/automaton"
+	"github.com/virtualtam/veccell/automaton"
 )
 
 const (
