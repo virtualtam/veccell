@@ -48,9 +48,9 @@ func main() {
 	} else {
 		elementary.StartWithCenter()
 	}
-	history := automaton.NewElementaryAutomatonHistory(termHeight, &elementary)
-	history.Draw()
+	elementaryRing := automaton.NewElementaryAutomatonRing(termHeight, &elementary)
+	elementaryRing.Draw()
 
-	controller := automaton.NewController(&history, &delay)
+	controller := automaton.NewController(&elementaryRing, &delay)
 	controller.Loop()
 }

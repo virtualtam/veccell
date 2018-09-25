@@ -109,14 +109,14 @@ func (a *ElementaryAutomaton) Draw() {
 	fmt.Println()
 }
 
-type ElementaryAutomatonHistory struct {
+type ElementaryAutomatonRing struct {
 	size      int
 	automaton *ElementaryAutomaton
 	history   *ring.Ring
 }
 
-func NewElementaryAutomatonHistory(size int, automaton *ElementaryAutomaton) ElementaryAutomatonHistory {
-	h := ElementaryAutomatonHistory{size: size, automaton: automaton}
+func NewElementaryAutomatonRing(size int, automaton *ElementaryAutomaton) ElementaryAutomatonRing {
+	h := ElementaryAutomatonRing{size: size, automaton: automaton}
 	h.history = ring.New(h.size)
 	for i := 0; i < h.history.Len(); i++ {
 		h.history.Value = make([]Cell, len(h.automaton.cells))
@@ -127,17 +127,17 @@ func NewElementaryAutomatonHistory(size int, automaton *ElementaryAutomaton) Ele
 	return h
 }
 
-func (h *ElementaryAutomatonHistory) Next() {
+func (h *ElementaryAutomatonRing) Next() {
 	h.automaton.Next()
 	copy(h.history.Value.([]Cell), h.automaton.cells)
 	h.history = h.history.Move(1)
 }
 
-func (h *ElementaryAutomatonHistory) Randomize() {
+func (h *ElementaryAutomatonRing) Randomize() {
 	h.automaton.Randomize()
 }
 
-func (h *ElementaryAutomatonHistory) Draw() {
+func (h *ElementaryAutomatonRing) Draw() {
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
 	row := 0
