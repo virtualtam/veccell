@@ -1,4 +1,4 @@
-// Package main implements an Elementary Cellular Automaton
+// Elementary Cellular Automaton implementation.
 //
 // The automaton is made of an array of Cells, each Cell having two possible
 // states.
@@ -13,27 +13,16 @@
 //  0   1   1   0   1   1   1   0   Rule 110
 //
 // The board is rendered on the terminal using the Termbox library.
-package main
+package automaton
 
 import (
 	"container/ring"
-	"flag"
 	"fmt"
-	"github.com/nsf/termbox-go"
 	"math/rand"
 	"strconv"
-	"time"
-)
 
-const (
-	DefaultDelay     = 1000 // Milliseconds
-	DefaultRandomize = false
-	DefaultRule      = 90
+	"github.com/nsf/termbox-go"
 )
-
-type Cell struct {
-	alive bool
-}
 
 type Rule struct {
 	number      int
@@ -144,6 +133,10 @@ func (h *ElementaryAutomatonHistory) Next() {
 	h.history = h.history.Move(1)
 }
 
+func (h *ElementaryAutomatonHistory) Randomize() {
+	h.automaton.Randomize()
+}
+
 func (h *ElementaryAutomatonHistory) Draw() {
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
@@ -159,96 +152,4 @@ func (h *ElementaryAutomatonHistory) Draw() {
 	})
 
 	termbox.Flush()
-}
-
-func main() {
-	var (
-		delay     int
-		randomize bool
-		rule      int
-	)
-
-	flag.IntVar(&delay, "delay", DefaultDelay, "Delay between two iterations (milliseconds)")
-	flag.BoolVar(&randomize, "randomize", DefaultRandomize, "Randomize initial state")
-	flag.IntVar(&rule, "rule", DefaultRule, "Automaton rule")
-	flag.Parse()
-
-	// Termbox setup
-	err := termbox.Init()
-	if err != nil {
-		panic(err)
-	}
-	defer termbox.Close()
-
-	termWidth, termHeight := termbox.Size()
-
-	eventQueue := make(chan termbox.Event)
-	go func() {
-		for {
-			eventQueue <- termbox.PollEvent()
-		}
-	}()
-
-	drawQueue := make(chan bool)
-	go func(delay *int) {
-		for {
-			time.Sleep(time.Duration(*delay) * time.Millisecond)
-			drawQueue <- true
-		}
-	}(&delay)
-
-	// Elementary automaton setup
-	rand.Seed(time.Now().UTC().UnixNano())
-
-	automaton := NewElementaryAutomaton(rule, termWidth)
-	if randomize {
-		automaton.Randomize()
-	} else {
-		automaton.StartWithCenter()
-	}
-	history := NewElementaryAutomatonHistory(termHeight, &automaton)
-	history.Draw()
-
-mainloop:
-	for {
-		select {
-		case <-drawQueue:
-			history.Next()
-			history.Draw()
-
-		case ev := <-eventQueue:
-			switch ev.Type {
-			case termbox.EventKey:
-				switch ev.Key {
-				case termbox.KeyEsc:
-					break mainloop
-				case termbox.KeyCtrlC:
-					break mainloop
-				case termbox.KeyArrowUp:
-					switch {
-					case delay < 10:
-						delay++
-					case delay < 100:
-						delay += 10
-					default:
-						delay += 100
-					}
-				case termbox.KeyArrowDown:
-					switch {
-					case delay > 100:
-						delay -= 100
-					case delay > 10:
-						delay -= 10
-					case delay > 2:
-						delay--
-					}
-				}
-
-				switch ev.Ch {
-				case 'q':
-					break mainloop
-				}
-			}
-		}
-	}
 }
