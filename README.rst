@@ -4,6 +4,21 @@ veccell - cellular automata - power gliders
 *veccell* is a pet project to toy with `Cellular Automata`_ and the `Go`_
 programming language.
 
+Building
+--------
+
+::
+
+   # get the sources
+   $ git clone https://github.com/virtualtam/veccell.git
+
+   # go >= 1.11: enable module support
+   $ export GO111MODULE=on
+
+   # build binaries
+   $ make build
+
+
 Automatons
 ----------
 
