@@ -18,19 +18,11 @@ const (
 	DefaultBorderCellsAlive = false
 )
 
-var (
-	borderCellsAlive bool
-	delay            int
-)
-
-func init() {
-	flag.BoolVar(&borderCellsAlive, "borderCellsAlive", DefaultBorderCellsAlive, "Whether the border cells are considered alive or dead")
-	flag.IntVar(&delay, "delay", DefaultDelay, "Delay between two iterations (milliseconds)")
+func main() {
+	borderCellsAlive := flag.Bool("borderCellsAlive", DefaultBorderCellsAlive, "Whether the border cells are considered alive or dead")
+	delay := flag.Int("delay", DefaultDelay, "Delay between two iterations (milliseconds)")
 	flag.Parse()
 
-}
-
-func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	// Termbox setup
@@ -43,13 +35,13 @@ func main() {
 	termWidth, termHeight := termbox.Size()
 
 	// Game board setup
-	board := automaton.NewGameOfLife(termHeight, termWidth, borderCellsAlive)
+	board := automaton.NewGameOfLife(termHeight, termWidth, *borderCellsAlive)
 	board.Randomize()
 	//board.RandomizeArea(0, termHeight/2, 0, termWidth/2)
 	//board.RandomizeArea(termHeight/4, 3*termHeight/4, termWidth/4, 3*termWidth/4)
 	//board.CreateGliderAt(7, 7)
 	board.Draw()
 
-	controller := automaton.NewController(&board, &delay)
+	controller := automaton.NewController(&board, delay)
 	controller.Loop()
 }

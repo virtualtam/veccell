@@ -23,21 +23,12 @@ const (
 	DefaultShowExplored = false
 )
 
-var (
-	delay        int
-	nColonies    int
-	showExplored bool
-)
-
-func init() {
-	flag.IntVar(&delay, "delay", DefaultDelay, "Delay between two iterations (milliseconds)")
-	flag.IntVar(&nColonies, "colonies", DefaultNColonies, "Number of colonies")
-	flag.BoolVar(&showExplored, "show-explored", DefaultShowExplored, "Show explored regions")
+func main() {
+	delay := flag.Int("delay", DefaultDelay, "Delay between two iterations (milliseconds)")
+	nColonies := flag.Int("colonies", DefaultNColonies, "Number of colonies")
+	showExplored := flag.Bool("show-explored", DefaultShowExplored, "Show explored regions")
 	flag.Parse()
 
-}
-
-func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	// Termbox setup
@@ -50,10 +41,10 @@ func main() {
 	termWidth, termHeight := termbox.Size()
 
 	// Game board setup
-	board := automaton.NewGameOfLifeDx(termHeight, termWidth, nColonies, showExplored)
+	board := automaton.NewGameOfLifeDx(termHeight, termWidth, *nColonies, *showExplored)
 	board.Randomize()
 	board.Draw()
 
-	controller := automaton.NewController(&board, &delay)
+	controller := automaton.NewController(&board, delay)
 	controller.Loop()
 }

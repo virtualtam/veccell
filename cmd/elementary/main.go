@@ -16,20 +16,12 @@ const (
 	DefaultRule      = 90
 )
 
-var (
-	delay     int
-	randomize bool
-	rule      int
-)
-
-func init() {
-	flag.IntVar(&delay, "delay", DefaultDelay, "Delay between two iterations (milliseconds)")
-	flag.BoolVar(&randomize, "randomize", DefaultRandomize, "Randomize initial state")
-	flag.IntVar(&rule, "rule", DefaultRule, "Automaton rule")
-	flag.Parse()
-}
-
 func main() {
+	delay := flag.Int("delay", DefaultDelay, "Delay between two iterations (milliseconds)")
+	randomize := flag.Bool("randomize", DefaultRandomize, "Randomize initial state")
+	rule := flag.Int("rule", DefaultRule, "Automaton rule")
+	flag.Parse()
+
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	// Termbox setup
@@ -42,8 +34,8 @@ func main() {
 	termWidth, termHeight := termbox.Size()
 
 	// Elementary automaton setup
-	elementary := automaton.NewElementaryAutomaton(rule, termWidth)
-	if randomize {
+	elementary := automaton.NewElementaryAutomaton(*rule, termWidth)
+	if *randomize {
 		elementary.Randomize()
 	} else {
 		elementary.StartWithCenter()
@@ -51,6 +43,6 @@ func main() {
 	elementaryRing := automaton.NewElementaryAutomatonRing(termHeight, &elementary)
 	elementaryRing.Draw()
 
-	controller := automaton.NewController(&elementaryRing, &delay)
+	controller := automaton.NewController(&elementaryRing, delay)
 	controller.Loop()
 }
