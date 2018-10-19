@@ -1,6 +1,4 @@
 *~
 *.swp
 
-elementary
-gameoflife
-gameoflifedx
+build/
