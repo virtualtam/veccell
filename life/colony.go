@@ -1,4 +1,4 @@
-package automaton
+package life
 
 import (
 	"github.com/nsf/termbox-go"

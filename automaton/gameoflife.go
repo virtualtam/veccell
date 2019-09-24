@@ -38,18 +38,18 @@ func NewGameOfLife(rows, cols int, borderCellsAlive bool) GameOfLife {
 //
 // See https://en.wikipedia.org/wiki/Glider_(Conway%27s_Life)
 func (g *GameOfLife) CreateGliderAt(row, col int) {
-	g.cells[row-1][col].alive = true
-	g.cells[row][col+1].alive = true
-	g.cells[row+1][col-1].alive = true
-	g.cells[row+1][col].alive = true
-	g.cells[row+1][col+1].alive = true
+	g.cells[row-1][col].Alive = true
+	g.cells[row][col+1].Alive = true
+	g.cells[row+1][col-1].Alive = true
+	g.cells[row+1][col].Alive = true
+	g.cells[row+1][col+1].Alive = true
 }
 
-// Randomize sets a board's Cells in a random state (alive|dead).
+// Randomize sets a board's Cells in a random state .Alive|dead).
 func (g *GameOfLife) Randomize() {
 	for i := 0; i < g.rows; i++ {
 		for j := 0; j < g.cols; j++ {
-			g.cells[i][j].alive = rand.Intn(2) == 1
+			g.cells[i][j].Alive = rand.Intn(2) == 1
 		}
 	}
 }
@@ -59,7 +59,7 @@ func (g *GameOfLife) Randomize() {
 func (g *GameOfLife) RandomizeArea(startRow, endRow, startCol, endCol int) {
 	for i := startRow; i < endRow; i++ {
 		for j := startCol; j < endCol; j++ {
-			g.cells[i][j].alive = rand.Intn(2) == 1
+			g.cells[i][j].Alive = rand.Intn(2) == 1
 		}
 	}
 }
@@ -88,7 +88,7 @@ func (g *GameOfLife) LiveNeighboursAt(row, col int) []*Cell {
 				continue
 			}
 
-			if g.cells[tmpRow][tmpCol].alive {
+			if g.cells[tmpRow][tmpCol].Alive {
 				neighbours = append(neighbours, &g.cells[tmpRow][tmpCol])
 			}
 		}
@@ -134,13 +134,13 @@ func (g *GameOfLife) Next() {
 				}
 			}
 
-			if g.cells[i][j].alive {
+			if g.cells[i][j].Alive {
 				if liveNeighbours == 2 || liveNeighbours == 3 {
-					nextBoard.cells[i][j].alive = true
+					nextBoard.cells[i][j].Alive = true
 				}
 			} else {
 				if liveNeighbours == 3 {
-					nextBoard.cells[i][j].alive = true
+					nextBoard.cells[i][j].Alive = true
 				}
 			}
 		}
@@ -155,7 +155,7 @@ func (g *GameOfLife) Draw() {
 
 	for i := 0; i < g.rows; i++ {
 		for j := 0; j < g.cols; j++ {
-			if g.cells[i][j].alive {
+			if g.cells[i][j].Alive {
 				termbox.SetCell(j, i, 'O', termbox.ColorDefault, termbox.ColorDefault)
 			}
 		}

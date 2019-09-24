@@ -57,12 +57,12 @@ func NewElementaryAutomaton(ruleNumber, size int) ElementaryAutomaton {
 
 func (a *ElementaryAutomaton) Randomize() {
 	for i := 0; i < len(a.cells); i++ {
-		a.cells[i].alive = rand.Intn(2) == 1
+		a.cells[i].Alive = rand.Intn(2) == 1
 	}
 }
 
 func (a *ElementaryAutomaton) StartWithCenter() {
-	a.cells[len(a.cells)/2].alive = true
+	a.cells[len(a.cells)/2].Alive = true
 }
 
 func (a *ElementaryAutomaton) Next() {
@@ -75,24 +75,24 @@ func (a *ElementaryAutomaton) Next() {
 
 		// left
 		if i > 0 {
-			if a.cells[i-1].alive {
+			if a.cells[i-1].Alive {
 				pattern += 4
 			}
 		}
 
 		// center
-		if a.cells[i].alive {
+		if a.cells[i].Alive {
 			pattern += 2
 		}
 
 		// right
 		if i < len(a.cells)-1 {
-			if a.cells[i+1].alive {
+			if a.cells[i+1].Alive {
 				pattern += 1
 			}
 		}
 
-		nextState[i].alive = a.rule.transitions[pattern]
+		nextState[i].Alive = a.rule.transitions[pattern]
 	}
 
 	a.cells = nextState
@@ -100,7 +100,7 @@ func (a *ElementaryAutomaton) Next() {
 
 func (a *ElementaryAutomaton) Draw() {
 	for i := 0; i < len(a.cells); i++ {
-		if a.cells[i].alive {
+		if a.cells[i].Alive {
 			fmt.Printf("+")
 		} else {
 			fmt.Printf(" ")
@@ -144,7 +144,7 @@ func (h *ElementaryAutomatonRing) Draw() {
 	h.history.Do(func(p interface{}) {
 		cells := p.([]Cell)
 		for col := 0; col < len(cells); col++ {
-			if cells[col].alive {
+			if cells[col].Alive {
 				termbox.SetCell(col, row, '+', termbox.ColorDefault, termbox.ColorDefault)
 			}
 		}

@@ -1,9 +1,11 @@
-package automaton
+package life
 
 import (
 	"math/rand"
 
 	"github.com/nsf/termbox-go"
+
+	"github.com/virtualtam/veccell/automaton"
 )
 
 const (
@@ -14,7 +16,7 @@ type GameOfLifeDx struct {
 	rows             int
 	cols             int
 	borderCellsAlive bool
-	cells            [][]Cell
+	cells            [][]DxCell
 	nColonies        int
 	colonies         []Colony
 	showExplored     bool
@@ -29,21 +31,21 @@ func NewGameOfLifeDx(rows, cols, nColonies int, showExplored bool) GameOfLifeDx 
 		showExplored: showExplored,
 	}
 	g.colonies = Colonies[:g.nColonies]
-	g.cells = make([][]Cell, g.rows)
+	g.cells = make([][]DxCell, g.rows)
 	for i := 0; i < g.rows; i++ {
-		g.cells[i] = make([]Cell, g.cols)
+		g.cells[i] = make([]DxCell, g.cols)
 	}
 
 	return g
 }
 
-// Randomize sets a board's Cells in a random state (alive|dead) and assigns
+// Randomize sets a board's Cells in a random state .Alive|dead) and assigns
 // it to a randomly chosen Colony.
 func (g *GameOfLifeDx) Randomize() {
 	for i := 0; i < g.rows; i++ {
 		for j := 0; j < g.cols; j++ {
-			g.cells[i][j].alive = rand.Intn(5) == 1
-			g.cells[i][j].onceAlive = g.cells[i][j].alive
+			g.cells[i][j].Alive = rand.Intn(5) == 1
+			g.cells[i][j].onceAlive = g.cells[i][j].Alive
 			g.cells[i][j].colony = &g.colonies[rand.Intn(g.nColonies)]
 		}
 	}
@@ -51,8 +53,8 @@ func (g *GameOfLifeDx) Randomize() {
 
 // LiveNeighboursAt returns the live Cells surrounding the Cell at the given
 // position.
-func (g *GameOfLifeDx) LiveNeighboursAt(row, col int) []*Cell {
-	neighbours := []*Cell{}
+func (g *GameOfLifeDx) LiveNeighboursAt(row, col int) []*DxCell {
+	neighbours := []*DxCell{}
 
 	for i := -1; i < 2; i++ {
 		for j := -1; j < 2; j++ {
@@ -73,7 +75,7 @@ func (g *GameOfLifeDx) LiveNeighboursAt(row, col int) []*Cell {
 				continue
 			}
 
-			if g.cells[tmpRow][tmpCol].alive {
+			if g.cells[tmpRow][tmpCol].Alive {
 				neighbours = append(neighbours, &g.cells[tmpRow][tmpCol])
 			}
 		}
@@ -111,14 +113,14 @@ func (g *GameOfLifeDx) Next() {
 			liveNeighbours := len(neighbours)
 			nextBoard.cells[i][j].onceAlive = g.cells[i][j].onceAlive
 
-			if g.cells[i][j].alive {
+			if g.cells[i][j].Alive {
 				if liveNeighbours == 2 || liveNeighbours == 3 {
-					nextBoard.cells[i][j].alive = true
+					nextBoard.cells[i][j].Alive = true
 					nextBoard.cells[i][j].ChooseColony(g.cells[i][j], neighbours)
 				}
 			} else {
 				if liveNeighbours == 3 {
-					nextBoard.cells[i][j].alive = true
+					nextBoard.cells[i][j].Alive = true
 					nextBoard.cells[i][j].onceAlive = true
 					nextBoard.cells[i][j].ChooseColony(g.cells[i][j], neighbours)
 				}
@@ -136,7 +138,7 @@ func (g *GameOfLifeDx) Draw() {
 	for i := 0; i < g.rows; i++ {
 		for j := 0; j < g.cols; j++ {
 			if g.showExplored {
-				if g.cells[i][j].alive {
+				if g.cells[i][j].Alive {
 					termbox.SetCell(
 						j,
 						i,
@@ -148,13 +150,13 @@ func (g *GameOfLifeDx) Draw() {
 					termbox.SetCell(j, i, ' ', termbox.ColorDefault, OnceAliveBackground)
 				}
 			} else {
-				if g.cells[i][j].alive {
+				if g.cells[i][j].Alive {
 					termbox.SetCell(
 						j,
 						i,
 						g.cells[i][j].colony.symbol,
 						g.cells[i][j].colony.color,
-						DefaultBackground,
+						automaton.DefaultBackground,
 					)
 				}
 			}
