@@ -11,6 +11,7 @@ import (
 	"github.com/nsf/termbox-go"
 
 	"github.com/virtualtam/veccell/automaton"
+	"github.com/virtualtam/veccell/life"
 )
 
 const (
@@ -35,7 +36,7 @@ func main() {
 	termWidth, termHeight := termbox.Size()
 
 	// Game board setup
-	board := automaton.NewGameOfLife(termHeight, termWidth, *borderCellsAlive)
+	board := life.NewGameOfLife(termHeight, termWidth, *borderCellsAlive)
 	board.Randomize()
 	//board.RandomizeArea(0, termHeight/2, 0, termWidth/2)
 	//board.RandomizeArea(termHeight/4, 3*termHeight/4, termWidth/4, 3*termWidth/4)

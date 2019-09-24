@@ -1,9 +1,10 @@
-package automaton
+package life
 
 import (
 	"math/rand"
 
 	"github.com/nsf/termbox-go"
+	"github.com/virtualtam/veccell/automaton"
 )
 
 // A GameOfLife holds the game's parameters and state.
@@ -11,7 +12,7 @@ type GameOfLife struct {
 	rows             int
 	cols             int
 	borderCellsAlive bool
-	cells            [][]Cell
+	cells            [][]automaton.Cell
 }
 
 // NewGameOfLife creates and initializes a Game Of Life automaton.
@@ -21,9 +22,9 @@ func NewGameOfLife(rows, cols int, borderCellsAlive bool) GameOfLife {
 		cols:             cols,
 		borderCellsAlive: borderCellsAlive,
 	}
-	g.cells = make([][]Cell, g.rows)
+	g.cells = make([][]automaton.Cell, g.rows)
 	for i := 0; i < g.rows; i++ {
-		g.cells[i] = make([]Cell, g.cols)
+		g.cells[i] = make([]automaton.Cell, g.cols)
 	}
 	return g
 }
@@ -66,8 +67,8 @@ func (g *GameOfLife) RandomizeArea(startRow, endRow, startCol, endCol int) {
 
 // LiveNeighboursAt returns the live Cells surrounding the Cell at the given
 // position.
-func (g *GameOfLife) LiveNeighboursAt(row, col int) []*Cell {
-	neighbours := []*Cell{}
+func (g *GameOfLife) LiveNeighboursAt(row, col int) []*automaton.Cell {
+	neighbours := []*automaton.Cell{}
 
 	for i := -1; i < 2; i++ {
 		for j := -1; j < 2; j++ {
