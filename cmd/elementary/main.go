@@ -8,6 +8,7 @@ import (
 	"github.com/nsf/termbox-go"
 
 	"github.com/virtualtam/veccell/automaton"
+	"github.com/virtualtam/veccell/elementary"
 )
 
 const (
@@ -34,13 +35,13 @@ func main() {
 	termWidth, termHeight := termbox.Size()
 
 	// Elementary automaton setup
-	elementary := automaton.NewElementaryAutomaton(*rule, termWidth)
+	a := elementary.NewElementaryAutomaton(*rule, termWidth)
 	if *randomize {
-		elementary.Randomize()
+		a.Randomize()
 	} else {
-		elementary.StartWithCenter()
+		a.StartWithCenter()
 	}
-	elementaryRing := automaton.NewElementaryAutomatonRing(termHeight, &elementary)
+	elementaryRing := elementary.NewElementaryAutomatonRing(termHeight, &a)
 	elementaryRing.Draw()
 
 	controller := automaton.NewController(&elementaryRing, delay)

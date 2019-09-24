@@ -13,7 +13,7 @@
 //  0   1   1   0   1   1   1   0   Rule 110
 //
 // The board is rendered on the terminal using the Termbox library.
-package automaton
+package elementary
 
 import (
 	"container/ring"
@@ -22,6 +22,8 @@ import (
 	"strconv"
 
 	"github.com/nsf/termbox-go"
+
+	"github.com/virtualtam/veccell/automaton"
 )
 
 type Rule struct {
@@ -43,16 +45,16 @@ func NewRule(number int) Rule {
 type ElementaryAutomaton struct {
 	rule  Rule
 	size  int
-	cells []Cell
+	cells []automaton.Cell
 }
 
 func NewElementaryAutomaton(ruleNumber, size int) ElementaryAutomaton {
-	automaton := ElementaryAutomaton{
+	a := ElementaryAutomaton{
 		rule: NewRule(ruleNumber),
 		size: size,
 	}
-	automaton.cells = make([]Cell, automaton.size)
-	return automaton
+	a.cells = make([]automaton.Cell, a.size)
+	return a
 }
 
 func (a *ElementaryAutomaton) Randomize() {
@@ -66,7 +68,7 @@ func (a *ElementaryAutomaton) StartWithCenter() {
 }
 
 func (a *ElementaryAutomaton) Next() {
-	nextState := make([]Cell, a.size)
+	nextState := make([]automaton.Cell, a.size)
 
 	pattern := 0
 
@@ -115,12 +117,12 @@ type ElementaryAutomatonRing struct {
 	history   *ring.Ring
 }
 
-func NewElementaryAutomatonRing(size int, automaton *ElementaryAutomaton) ElementaryAutomatonRing {
-	h := ElementaryAutomatonRing{size: size, automaton: automaton}
+func NewElementaryAutomatonRing(size int, a *ElementaryAutomaton) ElementaryAutomatonRing {
+	h := ElementaryAutomatonRing{size: size, automaton: a}
 	h.history = ring.New(h.size)
 	for i := 0; i < h.history.Len(); i++ {
-		h.history.Value = make([]Cell, len(h.automaton.cells))
-		copy(h.history.Value.([]Cell), h.automaton.cells)
+		h.history.Value = make([]automaton.Cell, len(h.automaton.cells))
+		copy(h.history.Value.([]automaton.Cell), h.automaton.cells)
 		h.history = h.history.Next()
 		h.automaton.Next()
 	}
@@ -129,7 +131,7 @@ func NewElementaryAutomatonRing(size int, automaton *ElementaryAutomaton) Elemen
 
 func (h *ElementaryAutomatonRing) Next() {
 	h.automaton.Next()
-	copy(h.history.Value.([]Cell), h.automaton.cells)
+	copy(h.history.Value.([]automaton.Cell), h.automaton.cells)
 	h.history = h.history.Move(1)
 }
 
@@ -142,7 +144,7 @@ func (h *ElementaryAutomatonRing) Draw() {
 
 	row := 0
 	h.history.Do(func(p interface{}) {
-		cells := p.([]Cell)
+		cells := p.([]automaton.Cell)
 		for col := 0; col < len(cells); col++ {
 			if cells[col].Alive {
 				termbox.SetCell(col, row, '+', termbox.ColorDefault, termbox.ColorDefault)
