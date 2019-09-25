@@ -1,9 +1,10 @@
-package automaton
+package render
 
 import (
 	"time"
 
 	"github.com/nsf/termbox-go"
+	"github.com/virtualtam/veccell/automaton"
 )
 
 const (
@@ -16,13 +17,13 @@ type Controller struct {
 	drawQueue  chan bool
 	eventQueue chan termbox.Event
 
-	automaton Automaton
+	automaton automaton.Automaton
 	delay     *int
 }
 
 // NewController creates and initializes a Controller.
-func NewController(automaton Automaton, delay *int) Controller {
-	c := Controller{automaton: automaton, delay: delay}
+func NewController(a automaton.Automaton, delay *int) Controller {
+	c := Controller{automaton: a, delay: delay}
 
 	c.breakQueue = make(chan bool)
 	c.drawQueue = make(chan bool)

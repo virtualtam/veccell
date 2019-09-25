@@ -5,7 +5,7 @@ import (
 
 	"github.com/nsf/termbox-go"
 
-	"github.com/virtualtam/veccell/automaton"
+	"github.com/virtualtam/veccell/render"
 )
 
 const (
@@ -156,7 +156,7 @@ func (g *GameOfLifeDx) Draw() {
 						i,
 						g.cells[i][j].colony.symbol,
 						g.cells[i][j].colony.color,
-						automaton.DefaultBackground,
+						render.DefaultBackground,
 					)
 				}
 			}

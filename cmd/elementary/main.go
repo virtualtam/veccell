@@ -7,8 +7,8 @@ import (
 
 	"github.com/nsf/termbox-go"
 
-	"github.com/virtualtam/veccell/automaton"
 	"github.com/virtualtam/veccell/elementary"
+	"github.com/virtualtam/veccell/render"
 )
 
 const (
@@ -44,6 +44,6 @@ func main() {
 	elementaryRing := elementary.NewElementaryAutomatonRing(termHeight, &a)
 	elementaryRing.Draw()
 
-	controller := automaton.NewController(&elementaryRing, delay)
+	controller := render.NewController(&elementaryRing, delay)
 	controller.Loop()
 }

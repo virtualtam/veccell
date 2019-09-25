@@ -14,8 +14,8 @@ import (
 
 	"github.com/nsf/termbox-go"
 
-	"github.com/virtualtam/veccell/automaton"
 	"github.com/virtualtam/veccell/life"
+	"github.com/virtualtam/veccell/render"
 )
 
 const (
@@ -46,6 +46,6 @@ func main() {
 	board.Randomize()
 	board.Draw()
 
-	controller := automaton.NewController(&board, delay)
+	controller := render.NewController(&board, delay)
 	controller.Loop()
 }
