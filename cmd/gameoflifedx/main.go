@@ -46,6 +46,6 @@ func main() {
 	board.Randomize()
 	board.Draw()
 
-	controller := render.NewController(&board, delay)
+	controller := render.NewController(&board, delay, &render.TermboxRenderer{})
 	controller.Loop()
 }

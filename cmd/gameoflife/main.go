@@ -43,6 +43,6 @@ func main() {
 	//board.CreateGliderAt(7, 7)
 	board.Draw()
 
-	controller := render.NewController(&board, delay)
+	controller := render.NewController(&board, delay, &render.TermboxRenderer{})
 	controller.Loop()
 }

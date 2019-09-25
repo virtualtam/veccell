@@ -152,8 +152,6 @@ func (g *GameOfLife) Next() {
 
 // Draw renders the automaton on the terminal.
 func (g *GameOfLife) Draw() {
-	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
-
 	for i := 0; i < g.rows; i++ {
 		for j := 0; j < g.cols; j++ {
 			if g.cells[i][j].Alive {
@@ -161,6 +159,4 @@ func (g *GameOfLife) Draw() {
 			}
 		}
 	}
-
-	termbox.Flush()
 }

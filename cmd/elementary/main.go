@@ -44,6 +44,6 @@ func main() {
 	elementaryRing := elementary.NewElementaryAutomatonRing(termHeight, &a)
 	elementaryRing.Draw()
 
-	controller := render.NewController(&elementaryRing, delay)
+	controller := render.NewController(&elementaryRing, delay, &render.TermboxRenderer{})
 	controller.Loop()
 }

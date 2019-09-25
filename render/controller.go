@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/nsf/termbox-go"
+
 	"github.com/virtualtam/veccell/automaton"
 )
 
@@ -19,11 +20,12 @@ type Controller struct {
 
 	automaton automaton.Automaton
 	delay     *int
+	renderer  Renderer
 }
 
 // NewController creates and initializes a Controller.
-func NewController(a automaton.Automaton, delay *int) Controller {
-	c := Controller{automaton: a, delay: delay}
+func NewController(a automaton.Automaton, delay *int, renderer Renderer) Controller {
+	c := Controller{automaton: a, delay: delay, renderer: renderer}
 
 	c.breakQueue = make(chan bool)
 	c.drawQueue = make(chan bool)
@@ -94,14 +96,24 @@ func (c *Controller) Break() {
 	}()
 }
 
+func (c *Controller) Next() {
+	c.automaton.Next()
+}
+
+func (c *Controller) Draw() {
+	c.renderer.Clear()
+	c.automaton.Draw()
+	c.renderer.Flush()
+}
+
 // Loop cycles through the automaton's iterations, and renders its state.
 func (c *Controller) Loop() {
 mainloop:
 	for {
 		select {
 		case <-c.drawQueue:
-			c.automaton.Next()
-			c.automaton.Draw()
+			c.Next()
+			c.Draw()
 
 		case <-c.breakQueue:
 			break mainloop

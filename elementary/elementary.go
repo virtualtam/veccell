@@ -140,8 +140,6 @@ func (h *ElementaryAutomatonRing) Randomize() {
 }
 
 func (h *ElementaryAutomatonRing) Draw() {
-	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
-
 	row := 0
 	h.history.Do(func(p interface{}) {
 		cells := p.([]automaton.Cell)
@@ -152,6 +150,4 @@ func (h *ElementaryAutomatonRing) Draw() {
 		}
 		row++
 	})
-
-	termbox.Flush()
 }

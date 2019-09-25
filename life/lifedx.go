@@ -133,8 +133,6 @@ func (g *GameOfLifeDx) Next() {
 
 // Draw renders the automaton on the terminal.
 func (g *GameOfLifeDx) Draw() {
-	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
-
 	for i := 0; i < g.rows; i++ {
 		for j := 0; j < g.cols; j++ {
 			if g.showExplored {
@@ -162,6 +160,4 @@ func (g *GameOfLifeDx) Draw() {
 			}
 		}
 	}
-
-	termbox.Flush()
 }
