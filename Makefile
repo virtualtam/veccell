@@ -8,3 +8,15 @@ build-%:
 
 distclean:
 	rm -rf build
+
+lint:
+	golangci-lint run
+.PHONY: lint
+
+test:
+	go test  ./...
+.PHONY: test
+
+coverage:
+	go test -cover ./...
+.PHONY: coverage
