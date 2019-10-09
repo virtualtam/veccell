@@ -13,13 +13,12 @@ const (
 )
 
 type GameOfLifeDx struct {
-	rows             int
-	cols             int
-	borderCellsAlive bool
-	cells            [][]DxCell
-	nColonies        int
-	colonies         []Colony
-	showExplored     bool
+	rows         int
+	cols         int
+	cells        [][]DxCell
+	nColonies    int
+	colonies     []Colony
+	showExplored bool
 }
 
 // NewGameOfLifeDx creates and initializes a Game Of Life automaton.
