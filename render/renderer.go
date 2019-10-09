@@ -10,7 +10,7 @@ type Renderer interface {
 type TermboxRenderer struct{}
 
 func (r *TermboxRenderer) Clear() {
-	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
+	_ = termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 }
 
 func (r *TermboxRenderer) Flush() {
